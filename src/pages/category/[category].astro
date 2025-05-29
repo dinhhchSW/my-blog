@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  // Lấy tất cả category duy nhất từ các bài viết
+  const categories = Array.from(
+    new Set(
+      allPosts.flatMap(post => ((post.data as any).categories || []).map((c: string) => c.toLowerCase()))
+    )
+  );
+  return categories.map(category => ({
+    params: { category }
+  }));
+}
+
+const { category } = Astro.params;
+const allPosts = await getCollection('blog');
+const filtered = allPosts.filter((post) => {
+  const categories = (post.data as any).categories || [];
+  return categories.includes(category?.toLowerCase());
+});
+---
+
+<h1>Category: {category}</h1>
+<ul>
+  {filtered.map(post => (
+    <li><a href={`/blog/${post.id}`}>{post.data.title}</a></li>
+  ))}
+</ul>

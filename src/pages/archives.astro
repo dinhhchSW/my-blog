@@ -1,0 +1,86 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { format } from 'date-fns';
+import Layout from '../layouts/BlogPost.astro';
+
+const posts = (await getCollection('blog')).sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime());
+
+// Gom nhóm theo năm
+const archiveMap = new Map<string, CollectionEntry<'blog'>[]>();
+for (const post of posts) {
+  const year = format(new Date(post.data.pubDate), 'yyyy');
+  if (!archiveMap.has(year)) {
+    archiveMap.set(year, []);
+  }
+  archiveMap.get(year)?.push(post);
+}
+---
+
+<Layout title="Archives" description="Tổng hợp các bài viết theo năm" pubDate={new Date()} heroImage="/blog-placeholder-1.jpg">
+  <section class="archives-simple">
+    {Array.from(archiveMap.entries()).map(([year, posts]) => (
+      <div class="archives-year-block">
+        <div class="archives-year">{year}</div>
+        <ul class="archives-list">
+          {posts.map(post => (
+            <li class="archives-item">
+              <span class="archives-date">{format(new Date(post.data.pubDate), 'dd/MM')}</span>
+              <a class="archives-title" href={`/blog/${post.id}`}>{post.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+  <style>
+    .archives-simple {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2em 0;
+    }
+    .archives-year-block {
+      margin-bottom: 2.5em;
+    }
+    .archives-year {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 0.7em;
+      color: #222;
+      letter-spacing: 2px;
+    }
+    .archives-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .archives-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.1em;
+      font-size: 1.08em;
+    }
+    .archives-date {
+      color: #888;
+      font-size: 0.98em;
+      min-width: 56px;
+      text-align: right;
+      margin-right: 18px;
+      font-family: monospace;
+    }
+    .archives-title {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .archives-title:hover {
+      color: var(--accent-dark);
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      .archives-simple { padding: 1em 0; }
+      .archives-date { min-width: 38px; font-size: 0.95em; margin-right: 10px; }
+      .archives-year { font-size: 1.3em; }
+    }
+  </style>
+</Layout>

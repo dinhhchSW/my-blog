@@ -4,14 +4,17 @@ interface Props {
 }
 
 const { date } = Astro.props;
+const validDate = date ? new Date(date) : null;
 ---
 
-<time datetime={date.toISOString()}>
+<time datetime={validDate ? validDate.toISOString() : ''}>
 	{
-		date.toLocaleDateString('en-us', {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-		})
+		validDate
+			? validDate.toLocaleDateString('en-us', {
+					year: 'numeric',
+					month: 'short',
+					day: 'numeric',
+			  })
+			: 'Invalid date'
 	}
 </time>
