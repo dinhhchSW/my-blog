@@ -16,7 +16,7 @@ for (const post of posts) {
 }
 ---
 
-<Layout title="Archives" description="Tổng hợp các bài viết theo năm" pubDate={new Date()} heroImage="/blog-placeholder-1.jpg">
+<Layout title="Archives" description="Tổng hợp các bài viết theo năm" pubDate={new Date()}>
   <section class="archives-simple">
     {Array.from(archiveMap.entries()).map(([year, posts]) => (
       <div class="archives-year-block">
